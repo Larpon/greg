@@ -44,23 +44,14 @@ jobs:
 
       - name: Build test binaries
         run: |
-          #mkdir -p /tmp/greg
           mkdir -p /tmp/examples/gg/
-          ./v -o examples/gg/rectangles examples/gg/rectangles.v
-          #sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           sudo /usr/bin/Xvfb $DISPLAY -screen 0 1000x600x24 &
-          #xvfb-run glxinfo
-          #xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout --auth-file=/tmp/greg/greg-x-auth examples/gg/rectangles &
-          #xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout examples/gg/rectangles &
-          #sudo xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout examples/gg/rectangles &
-          sleep 2
+          ./v -o examples/gg/rectangles examples/gg/rectangles.v
           examples/gg/rectangles &
           sleep 2
-          #export XAUTHORITY=/tmp/greg/greg-x-auth
-          #import -window root /tmp/examples/gg/rectangles_ttt.png
           sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
           sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
-          #killall rectangles
+          killall rectangles
 
       - name: Compare
         id: compare
