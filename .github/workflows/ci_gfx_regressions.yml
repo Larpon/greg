@@ -64,9 +64,9 @@ jobs:
           #convert xwd:- png:- >/tmp/examples/gg/rectangles.png
           #xwd -display :99 -root -silent | convert xwd:- png:- >/tmp/examples/gg/rectangles.png
           #killall Xvfb
-          sudo idiff greg/examples/gg/rectangles.png /tmp/examples/gg/rectangles.png
+          sudo idiff greg/examples/gg/rectangles.png /tmp/examples/gg/rectangles.png || ./imgur.sh /tmp/examples/gg/rectangles.png
           echo ::set-output name=exit_code::$?
 
-      - name: Upload regression to imgur
-        if: steps.test_bins.outputs.exit_code != 0
-        run: ./imgur.sh /tmp/examples/gg/rectangles.png
+#      - name: Upload regression to imgur
+#        if: steps.test_bins.outputs.exit_code != 0
+#        run: ./imgur.sh /tmp/examples/gg/rectangles.png
