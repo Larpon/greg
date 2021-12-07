@@ -51,11 +51,11 @@ jobs:
       - name: Build test binaries
         run: |
           mkdir -p /tmp/examples/gg/
-          sudo /usr/bin/Xvfb -screen 0 1000x600x24 &
-          ./v -o examples/gg/rectangles examples/gg/rectangles.v
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1000x600x24 &
+          ./v -o examples/gg/rectangles examples/gg/rectangles.vz
           sudo examples/gg/rectangles &
           sleep 1
-          sudo xwd -root -silent -out /tmp/examples/gg/rectangles.xwd
+          sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
           sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
           killall rectangles
 
