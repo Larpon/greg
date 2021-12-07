@@ -55,7 +55,7 @@ jobs:
           #xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout examples/gg/rectangles &
           #sudo xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout examples/gg/rectangles &
           sleep 2
-          examples/gg/rectangles
+          examples/gg/rectangles &
           sleep 2
           #export XAUTHORITY=/tmp/greg/greg-x-auth
           #import -window root /tmp/examples/gg/rectangles_ttt.png
