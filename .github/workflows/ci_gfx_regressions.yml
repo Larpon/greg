@@ -54,7 +54,8 @@ jobs:
           sudo /usr/bin/Xvfb $DISPLAY -screen 0 1000x600x24 &
           ./v -o examples/gg/rectangles examples/gg/rectangles.v
           examples/gg/rectangles &
-          sleep 1
+          sleep 2
+          # TODO -id <win id>
           sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
           sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
           killall rectangles
