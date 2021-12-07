@@ -43,7 +43,6 @@ jobs:
         run: make -j4
 
       - name: Build test binaries
-        id: test_bins
         run: |
           #mkdir -p /tmp/greg
           mkdir -p /tmp/examples/gg/
@@ -61,12 +60,16 @@ jobs:
           #import -window root /tmp/examples/gg/rectangles_ttt.png
           sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
           sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
-          #convert xwd:- png:- >/tmp/examples/gg/rectangles.png
-          #xwd -display :99 -root -silent | convert xwd:- png:- >/tmp/examples/gg/rectangles.png
-          #killall Xvfb
-          sudo idiff greg/examples/gg/rectangles.png /tmp/examples/gg/rectangles.png || ./imgur.sh /tmp/examples/gg/rectangles.png
-          echo ::set-output name=exit_code::$?
+          #killall rectangles
 
-#      - name: Upload regression to imgur
-#        if: steps.test_bins.outputs.exit_code != 0
-#        run: ./imgur.sh /tmp/examples/gg/rectangles.png
+      - name: Compare
+        id: compare
+        continue-on-error: true
+        run: |
+          sudo idiff greg/examples/gg/rectangles.png /tmp/examples/gg/rectangles.png
+
+      - name: Upload regression to imgur
+        if: steps.compare.outcome != 'success'
+        run: |
+          ./imgur.sh /tmp/examples/gg/rectangles.png
+          exit 1
