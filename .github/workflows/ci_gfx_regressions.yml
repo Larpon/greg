@@ -56,7 +56,7 @@ jobs:
           examples/gg/rectangles &
           sleep 2
           # TODO -id <win id>
-          sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
+          sudo xwd -display $DISPLAY -root -nobdrs -silent -out /tmp/examples/gg/rectangles.xwd
           sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
           killall rectangles
 
