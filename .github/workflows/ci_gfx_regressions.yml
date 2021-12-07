@@ -35,7 +35,13 @@ jobs:
 
       - name: Setup dependencies
         run: |
-          sudo apt-get install imagemagick openimageio-tools mesa-common-dev libxcursor-dev libxi-dev freeglut3-dev x11-apps
+          # xvfb: xvfb (installed by openrndr/setup-opengl@v1.1)
+          # x11-utils: xwininfo -root -int -tree
+          # x11-apps: xwd
+          # openimageio-tools: idiff
+          # mesa-common-dev libxcursor-dev libxi-dev: V deps for headless rendering
+          # freeglut3-dev: fix graphic apps compilation with tcc
+          sudo apt-get install imagemagick openimageio-tools mesa-common-dev libxcursor-dev libxi-dev freeglut3-dev x11-apps x11-utils
           wget https://raw.githubusercontent.com/tremby/imgur.sh/c98345d/imgur.sh
           chmod +x ./imgur.sh
 
@@ -45,11 +51,11 @@ jobs:
       - name: Build test binaries
         run: |
           mkdir -p /tmp/examples/gg/
-          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1000x600x24 &
+          sudo /usr/bin/Xvfb -screen 0 1000x600x24 &
           ./v -o examples/gg/rectangles examples/gg/rectangles.v
           examples/gg/rectangles &
-          sleep 2
-          sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
+          sleep 1
+          sudo xwd -root -silent -out /tmp/examples/gg/rectangles.xwd
           sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
           killall rectangles
 
