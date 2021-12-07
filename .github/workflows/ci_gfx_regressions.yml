@@ -1,0 +1,72 @@
+name: Graphic Regressions CI
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  no-scheduling:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dont schedule all jobs
+        run: sleep 10
+
+  gfx-regressions:
+    needs: no-scheduling
+    runs-on: ubuntu-18.04
+    timeout-minutes: 15
+    env:
+      VFLAGS: -cc tcc
+      DISPLAY: :99
+    steps:
+      - name: Checkout V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+
+      - uses: openrndr/setup-opengl@v1.1
+      - uses: actions/checkout@v2
+        with:
+          path: greg
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get install imagemagick openimageio-tools mesa-common-dev libxcursor-dev libxi-dev freeglut3-dev x11-apps
+          wget https://raw.githubusercontent.com/tremby/imgur.sh/c98345d/imgur.sh
+          chmod +x ./imgur.sh
+
+      - name: Build local v
+        run: make -j4
+
+      - name: Build test binaries
+        id: test_bins
+        run: |
+          #mkdir -p /tmp/greg
+          mkdir -p /tmp/examples/gg/
+          ./v -o examples/gg/rectangles examples/gg/rectangles.v
+          #sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1000x600x24 &
+          #xvfb-run glxinfo
+          #xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout --auth-file=/tmp/greg/greg-x-auth examples/gg/rectangles &
+          #xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout examples/gg/rectangles &
+          #sudo xvfb-run --server-args="-screen 0 1000x600x24" --error-file=/dev/stdout examples/gg/rectangles &
+          sleep 2
+          examples/gg/rectangles
+          sleep 2
+          #export XAUTHORITY=/tmp/greg/greg-x-auth
+          #import -window root /tmp/examples/gg/rectangles_ttt.png
+          sudo xwd -display $DISPLAY -root -silent -out /tmp/examples/gg/rectangles.xwd
+          sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
+          #convert xwd:- png:- >/tmp/examples/gg/rectangles.png
+          #xwd -display :99 -root -silent | convert xwd:- png:- >/tmp/examples/gg/rectangles.png
+          #killall Xvfb
+          sudo idiff greg/examples/gg/rectangles.png /tmp/examples/gg/rectangles.png
+          echo ::set-output name=exit_code::$?
+
+      - name: Upload regression to imgur
+        if: steps.test_bins.outputs.exit_code != 0
+        run: ./imgur.sh /tmp/examples/gg/rectangles.png
