@@ -51,13 +51,13 @@ jobs:
       - name: Build test binaries
         run: |
           mkdir -p /tmp/examples/gg/
-          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1000x600x24 &
+          Xvfb $DISPLAY -screen 0 1000x600x24 &
           ./v -o examples/gg/rectangles examples/gg/rectangles.v
           examples/gg/rectangles &
-          sleep 2
+          sleep 2 # give the example time to start AND open a window
           # TODO -id <win id>
-          sudo xwd -display $DISPLAY -root -nobdrs -silent -out /tmp/examples/gg/rectangles.xwd
-          sudo convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
+          xwd -display $DISPLAY -root -nobdrs -silent -out /tmp/examples/gg/rectangles.xwd
+          convert xwd:/tmp/examples/gg/rectangles.xwd png:/tmp/examples/gg/rectangles.png
           killall rectangles
 
       - name: Compare
